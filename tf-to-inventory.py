@@ -34,7 +34,7 @@ for module in state["modules"]:
         if resource_type == "openstack_compute_instance_v2" :
             ostype = "centos"
             name = attributes["name"]
-            if attributes["floating_ip"] != "":
+            if "floating_ip" in attributes:
                 hosts[name] = attributes["floating_ip"]
             else :
                 hosts[name] = attributes["access_ip_v4"]

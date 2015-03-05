@@ -2,6 +2,7 @@ import json
 
 hosts = {}
 groups = {}
+ostype = "ubuntu"
 
 with open("terraform.tfstate") as fp:
     state = json.load(fp)
@@ -30,9 +31,21 @@ for module in state["modules"]:
                 "index": index
             }
 
+        if resource_type == "openstack_compute_instance_v2" :
+            ostype = "centos"
+            name = attributes["name"]
+            if attributes["floating_ip"] != "":
+                hosts[name] = attributes["floating_ip"]
+            else :
+                hosts[name] = attributes["access_ip_v4"]
+
+            groups.setdefault(group_name, {})[name] = {
+                "index": index
+            }
+
 with open("hosts", "w") as fp:
     for host, ip_address in hosts.iteritems():
-        fp.write("{} ansible_ssh_host={} ansible_ssh_user=ubuntu\n".format(host, ip_address))
+        fp.write("{} ansible_ssh_host={} ansible_ssh_user={}\n".format(host, ip_address, ostype))
 
     fp.write("\n")
 
